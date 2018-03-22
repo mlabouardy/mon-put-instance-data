@@ -22,3 +22,18 @@
 ```
 cloudwatch --memory --swap --disk --duration 1
 ```
+
+* IAM Policy
+
+```
+{
+    "Effect": "Allow",
+    "Statement": "cloudwatch:PutMetricData"
+    "Resource": "*"
+}
+```
+
+## TO DO
+
+* Docker
+* Network

@@ -1,4 +1,4 @@
-package main
+package services
 
 import (
 	"log"
@@ -7,12 +7,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 )
 
-type CloudWatch struct {
-	cfg aws.Config
+type CloudWatchService struct {
+	Config aws.Config
 }
 
-func (c CloudWatch) Publish(metricData []cloudwatch.MetricDatum, namespace string) {
-	svc := cloudwatch.New(c.cfg)
+func (c CloudWatchService) Publish(metricData []cloudwatch.MetricDatum, namespace string) {
+	svc := cloudwatch.New(c.Config)
 	req := svc.PutMetricDataRequest(&cloudwatch.PutMetricDataInput{
 		MetricData: metricData,
 		Namespace:  &namespace,
@@ -20,7 +20,5 @@ func (c CloudWatch) Publish(metricData []cloudwatch.MetricDatum, namespace strin
 	_, err := req.Send()
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		log.Printf("Metric %s has been save\n", namespace)
 	}
 }

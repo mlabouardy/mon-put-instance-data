@@ -1,40 +1,23 @@
 package main
 
 import (
-	"log"
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/shirou/gopsutil/mem"
+	. "github.com/mlabouardy/cloudwatch/metrics"
+	. "github.com/mlabouardy/cloudwatch/services"
 	"github.com/urfave/cli"
 )
 
-const DIMENSION_NAME = "InstanceId"
-
-func GetInstanceId() {
-
+func GetInstanceId() string {
+	return "hello"
 }
 
-func collectMetrics(cfg aws.Config, collectMemory, collectSwap, collectDisk bool) {
-	swapMetrics, err := mem.SwapMemory()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if collectMemory {
-
-	}
-
-	if collectSwap {
-		putMetricData(cfg, "CustomMetrics", "SwapUtilization", swapMetrics.UsedPercent, cloudwatch.StandardUnitPercent, "1-78787")
-		putMetricData(cfg, "CustomMetrics", "SwapUsed", float64(swapMetrics.Used), cloudwatch.StandardUnitBytes, "1-78787")
-	}
-
-	if collectDisk {
-
+func Collect(metrics []Metric, c CloudWatchService) {
+	id := GetInstanceId()
+	for _, metric := range metrics {
+		metric.Collect(id, c)
 	}
 }
 
@@ -64,20 +47,29 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) error {
-		collectMemory := c.Bool("memory")
-		collectSwap := c.Bool("swap")
-		collectDisk := c.Bool("disk")
-		interval := c.Int("interval")
+		metrics := make([]Metric, 0)
+		if c.Bool("memory") {
+			metrics = append(metrics, Memory{})
+		}
+		if c.Bool("swap") {
+			metrics = append(metrics, Swap{})
+		}
+		if c.Bool("disk") {
+			metrics = append(metrics, Disk{})
+		}
 
 		cfg, err := external.LoadDefaultAWSConfig()
 		if err != nil {
 			panic("Unable to load SDK config")
 		}
+		cloudWatch := CloudWatchService{
+			Config: cfg,
+		}
 
+		interval := c.Int("interval")
 		duration := time.Duration(interval) * time.Minute
 		for _ = range time.Tick(duration) {
-			collectMetrics(cfg, collectMemory, collectSwap, collectDisk)
-			log.Printf("Waiting for %d minutes ...", interval)
+			Collect(metrics, cloudWatch)
 		}
 
 		return nil
