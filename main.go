@@ -40,6 +40,10 @@ func main() {
 			Name:  "disk",
 			Usage: "Collect disk metrics",
 		},
+		cli.BoolFlag{
+			Name:  "docker",
+			Usage: "Collect containers metrics",
+		},
 		cli.IntFlag{
 			Name:  "interval",
 			Usage: "Time interval",
@@ -56,6 +60,9 @@ func main() {
 		}
 		if c.Bool("disk") {
 			metrics = append(metrics, Disk{})
+		}
+		if c.Bool("docker") {
+			metrics = append(metrics, Docker{})
 		}
 
 		cfg, err := external.LoadDefaultAWSConfig()
