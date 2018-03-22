@@ -1,6 +1,9 @@
 package main
 
 import (
+	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -10,12 +13,31 @@ import (
 	"github.com/urfave/cli"
 )
 
-func GetInstanceId() string {
-	return "hello"
+func GetInstanceId() (string, error) {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "http://169.254.169.254/latest/meta-data/instance-id", nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
 
 func Collect(metrics []Metric, c CloudWatchService) {
-	id := GetInstanceId()
+	id, err := GetInstanceId()
+	if err != nil {
+		log.Fatal(err)
+	}
 	for _, metric := range metrics {
 		metric.Collect(id, c)
 	}
@@ -44,6 +66,11 @@ func main() {
 			Name:  "docker",
 			Usage: "Collect containers metrics",
 		},
+		cli.StringFlag{
+			Name:  "region",
+			Usage: "AWS region",
+			Value: "us-east-1",
+		},
 		cli.IntFlag{
 			Name:  "interval",
 			Usage: "Time interval",
@@ -69,6 +96,8 @@ func main() {
 		if err != nil {
 			panic("Unable to load SDK config")
 		}
+
+		cfg.Region = c.String("region")
 		cloudWatch := CloudWatchService{
 			Config: cfg,
 		}
