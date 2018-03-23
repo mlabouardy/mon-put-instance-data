@@ -1,9 +1,7 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -14,7 +12,7 @@ import (
 )
 
 func GetInstanceId() (string, error) {
-	client := &http.Client{}
+	/*client := &http.Client{}
 	req, err := http.NewRequest("GET", "http://169.254.169.254/latest/meta-data/instance-id", nil)
 	if err != nil {
 		return "", err
@@ -30,7 +28,8 @@ func GetInstanceId() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(data), nil
+	return string(data), nil*/
+	return "test", nil
 }
 
 func Collect(metrics []Metric, c CloudWatchService) {

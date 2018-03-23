@@ -53,6 +53,11 @@ cloudwatch --memory --swap --disk --docker --duration 1
 * Memory Utilization per Container
 * CPU User/System per Container
 
+## Supported AMI
+
+* Amazon Linux
+* Ubuntu
+
 ## TO DO
 
 * Network

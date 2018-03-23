@@ -16,18 +16,16 @@ func (n Network) Collect(instanceId string, c CloudWatchService) {
 		log.Fatal(err)
 	}
 
-	dimensionKey := "InstanceId"
-	dimensions := []cloudwatch.Dimension{
-		cloudwatch.Dimension{
-			Name:  &dimensionKey,
-			Value: &instanceId,
-		},
-	}
-
 	for _, iocounter := range networkMetrics {
-		dimensionKey = "IOCounter"
+		dimensions := make([]cloudwatch.Dimension, 0)
+		dimensionKey1 := "InstanceId"
 		dimensions = append(dimensions, cloudwatch.Dimension{
-			Name:  &dimensionKey,
+			Name:  &dimensionKey1,
+			Value: &instanceId,
+		})
+		dimensionKey2 := "IOCounter"
+		dimensions = append(dimensions, cloudwatch.Dimension{
+			Name:  &dimensionKey2,
 			Value: &iocounter.Name,
 		})
 
@@ -43,10 +41,10 @@ func (n Network) Collect(instanceId string, c CloudWatchService) {
 
 		errorsInData := constructMetricDatum("ErrorsIn", float64(iocounter.Errin), cloudwatch.StandardUnitBytes, dimensions)
 		c.Publish(errorsInData, "CustomMetrics")
-		errorsOutData := constructMetricDatum("ContainerMemory", float64(iocounter.Errout), cloudwatch.StandardUnitBytes, dimensions)
+		errorsOutData := constructMetricDatum("ErrorsOut", float64(iocounter.Errout), cloudwatch.StandardUnitBytes, dimensions)
 		c.Publish(errorsOutData, "CustomMetrics")
 
-		log.Printf("Network - %s Bytes In/Out: %v/%v Packets In/Out: %v/%s Errors In/Out: %v/%v\n",
+		log.Printf("Network - %s Bytes In/Out: %v/%v Packets In/Out: %v/%v Errors In/Out: %v/%v\n",
 			iocounter.Name, iocounter.BytesRecv, iocounter.BytesSent, iocounter.Errin,
 			iocounter.Errout, iocounter.PacketsRecv, iocounter.PacketsSent)
 	}

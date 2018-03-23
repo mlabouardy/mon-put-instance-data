@@ -10,7 +10,6 @@ type Metric interface {
 }
 
 func constructMetricDatum(metricName string, value float64, unit cloudwatch.StandardUnit, dimensions []cloudwatch.Dimension) []cloudwatch.MetricDatum {
-	dimensionKey := "InstanceId"
 	return []cloudwatch.MetricDatum{
 		cloudwatch.MetricDatum{
 			MetricName: &metricName,
