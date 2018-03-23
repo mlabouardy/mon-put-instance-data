@@ -3,6 +3,7 @@ package metrics
 import (
 	"log"
 
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	. "github.com/mlabouardy/cloudwatch/services"
 	"github.com/shirou/gopsutil/net"
 )
@@ -15,7 +16,36 @@ func (n Network) Collect(instanceId string, c CloudWatchService) {
 		log.Fatal(err)
 	}
 
+	dimensionKey := "InstanceId"
+	dimensions := []cloudwatch.Dimension{
+		cloudwatch.Dimension{
+			Name:  &dimensionKey,
+			Value: &instanceId,
+		},
+	}
+
 	for _, iocounter := range networkMetrics {
+		dimensionKey = "IOCounter"
+		dimensions = append(dimensions, cloudwatch.Dimension{
+			Name:  &dimensionKey,
+			Value: &iocounter.Name,
+		})
+
+		bytesInData := constructMetricDatum("BytesIn", float64(iocounter.BytesRecv), cloudwatch.StandardUnitBytes, dimensions)
+		c.Publish(bytesInData, "CustomMetrics")
+		bytesOutData := constructMetricDatum("BytesOut", float64(iocounter.BytesSent), cloudwatch.StandardUnitBytes, dimensions)
+		c.Publish(bytesOutData, "CustomMetrics")
+
+		packetsInData := constructMetricDatum("PacketsIn", float64(iocounter.PacketsRecv), cloudwatch.StandardUnitBytes, dimensions)
+		c.Publish(packetsInData, "CustomMetrics")
+		packetsOutData := constructMetricDatum("PacketsOut", float64(iocounter.PacketsSent), cloudwatch.StandardUnitBytes, dimensions)
+		c.Publish(packetsOutData, "CustomMetrics")
+
+		errorsInData := constructMetricDatum("ErrorsIn", float64(iocounter.Errin), cloudwatch.StandardUnitBytes, dimensions)
+		c.Publish(errorsInData, "CustomMetrics")
+		errorsOutData := constructMetricDatum("ContainerMemory", float64(iocounter.Errout), cloudwatch.StandardUnitBytes, dimensions)
+		c.Publish(errorsOutData, "CustomMetrics")
+
 		log.Printf("Network - %s Bytes In/Out: %v/%v Packets In/Out: %v/%s Errors In/Out: %v/%v\n",
 			iocounter.Name, iocounter.BytesRecv, iocounter.BytesSent, iocounter.Errin,
 			iocounter.Errout, iocounter.PacketsRecv, iocounter.PacketsSent)
