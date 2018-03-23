@@ -16,13 +16,21 @@ func (d Disk) Collect(instanceId string, c CloudWatchService) {
 		log.Fatal(err)
 	}
 
-	diskUtilizationData := constructMetricDatum("DiskUtilization", diskMetrics.UsedPercent, cloudwatch.StandardUnitPercent, instanceId)
+	dimensionKey := "InstanceId"
+	dimensions := []cloudwatch.Dimension{
+		cloudwatch.Dimension{
+			Name:  &dimensionKey,
+			Value: &instanceId,
+		},
+	}
+
+	diskUtilizationData := constructMetricDatum("DiskUtilization", diskMetrics.UsedPercent, cloudwatch.StandardUnitPercent, dimensions)
 	c.Publish(diskUtilizationData, "CustomMetrics")
 
-	diskUsedData := constructMetricDatum("DiskUsed", float64(diskMetrics.Used), cloudwatch.StandardUnitBytes, instanceId)
+	diskUsedData := constructMetricDatum("DiskUsed", float64(diskMetrics.Used), cloudwatch.StandardUnitBytes, dimensions)
 	c.Publish(diskUsedData, "CustomMetrics")
 
-	diskFreeData := constructMetricDatum("DiskFree", float64(diskMetrics.Free), cloudwatch.StandardUnitBytes, instanceId)
+	diskFreeData := constructMetricDatum("DiskFree", float64(diskMetrics.Free), cloudwatch.StandardUnitBytes, dimensions)
 	c.Publish(diskFreeData, "CustomMetrics")
 
 	log.Printf("Disk - Utilization:%v%% Used:%v Free:%v\n", diskMetrics.UsedPercent, diskMetrics.Used, diskMetrics.Free)

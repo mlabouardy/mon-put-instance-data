@@ -9,19 +9,14 @@ type Metric interface {
 	Collect(string, CloudWatchService)
 }
 
-func constructMetricDatum(metricName string, value float64, unit cloudwatch.StandardUnit, instanceId string) []cloudwatch.MetricDatum {
+func constructMetricDatum(metricName string, value float64, unit cloudwatch.StandardUnit, dimensions []cloudwatch.Dimension) []cloudwatch.MetricDatum {
 	dimensionKey := "InstanceId"
 	return []cloudwatch.MetricDatum{
 		cloudwatch.MetricDatum{
 			MetricName: &metricName,
-			Dimensions: []cloudwatch.Dimension{
-				cloudwatch.Dimension{
-					Name:  &dimensionKey,
-					Value: &instanceId,
-				},
-			},
-			Unit:  unit,
-			Value: &value,
+			Dimensions: dimensions,
+			Unit:       unit,
+			Value:      &value,
 		},
 	}
 }

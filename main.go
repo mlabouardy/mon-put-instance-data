@@ -63,6 +63,10 @@ func main() {
 			Usage: "Collect disk metrics",
 		},
 		cli.BoolFlag{
+			Name:  "network",
+			Usage: "Collect network metrics",
+		},
+		cli.BoolFlag{
 			Name:  "docker",
 			Usage: "Collect containers metrics",
 		},
@@ -87,6 +91,9 @@ func main() {
 		}
 		if c.Bool("disk") {
 			metrics = append(metrics, Disk{})
+		}
+		if c.Bool("network") {
+			metrics = append(metrics, Network{})
 		}
 		if c.Bool("docker") {
 			metrics = append(metrics, Docker{})

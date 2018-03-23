@@ -16,13 +16,21 @@ func (d Swap) Collect(instanceId string, c CloudWatchService) {
 		log.Fatal(err)
 	}
 
-	swapUtilizationData := constructMetricDatum("SwapUtilization", swapMetrics.UsedPercent, cloudwatch.StandardUnitPercent, instanceId)
+	dimensionKey := "InstanceId"
+	dimensions := []cloudwatch.Dimension{
+		cloudwatch.Dimension{
+			Name:  &dimensionKey,
+			Value: &instanceId,
+		},
+	}
+
+	swapUtilizationData := constructMetricDatum("SwapUtilization", swapMetrics.UsedPercent, cloudwatch.StandardUnitPercent, dimensions)
 	c.Publish(swapUtilizationData, "CustomMetrics")
 
-	swapUsedData := constructMetricDatum("SwapUsed", float64(swapMetrics.Used), cloudwatch.StandardUnitBytes, instanceId)
+	swapUsedData := constructMetricDatum("SwapUsed", float64(swapMetrics.Used), cloudwatch.StandardUnitBytes, dimensions)
 	c.Publish(swapUsedData, "CustomMetrics")
 
-	swapFreeData := constructMetricDatum("SwapFree", float64(swapMetrics.Free), cloudwatch.StandardUnitBytes, instanceId)
+	swapFreeData := constructMetricDatum("SwapFree", float64(swapMetrics.Free), cloudwatch.StandardUnitBytes, dimensions)
 	c.Publish(swapFreeData, "CustomMetrics")
 
 	log.Printf("Swap - Utilization:%v%% Used:%v Free:%v\n", swapMetrics.UsedPercent, swapMetrics.Used, swapMetrics.Free)

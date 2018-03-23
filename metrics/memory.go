@@ -16,13 +16,21 @@ func (m Memory) Collect(instanceId string, c CloudWatchService) {
 		log.Fatal(err)
 	}
 
-	memoryUtilizationData := constructMetricDatum("MemoryUtilization", memoryMetrics.UsedPercent, cloudwatch.StandardUnitPercent, instanceId)
+	dimensionKey := "InstanceId"
+	dimensions := []cloudwatch.Dimension{
+		cloudwatch.Dimension{
+			Name:  &dimensionKey,
+			Value: &instanceId,
+		},
+	}
+
+	memoryUtilizationData := constructMetricDatum("MemoryUtilization", memoryMetrics.UsedPercent, cloudwatch.StandardUnitPercent, dimensions)
 	c.Publish(memoryUtilizationData, "CustomMetrics")
 
-	memoryUsedData := constructMetricDatum("MemoryUsed", float64(memoryMetrics.Used), cloudwatch.StandardUnitBytes, instanceId)
+	memoryUsedData := constructMetricDatum("MemoryUsed", float64(memoryMetrics.Used), cloudwatch.StandardUnitBytes, dimensions)
 	c.Publish(memoryUsedData, "CustomMetrics")
 
-	memoryAvailableData := constructMetricDatum("MemoryAvailable", float64(memoryMetrics.Available), cloudwatch.StandardUnitBytes, instanceId)
+	memoryAvailableData := constructMetricDatum("MemoryAvailable", float64(memoryMetrics.Available), cloudwatch.StandardUnitBytes, dimensions)
 	c.Publish(memoryAvailableData, "CustomMetrics")
 
 	log.Printf("Memory - Utilization:%v%% Used:%v Available:%v\n", memoryMetrics.UsedPercent, memoryMetrics.Used, memoryMetrics.Available)
