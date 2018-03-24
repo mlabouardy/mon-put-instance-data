@@ -10,6 +10,7 @@ import (
 
 type Network struct{}
 
+// Collect Network Traffic metrics
 func (n Network) Collect(instanceId string, c CloudWatchService) {
 	networkMetrics, err := net.IOCounters(false)
 	if err != nil {

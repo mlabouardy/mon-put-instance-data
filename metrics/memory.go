@@ -10,6 +10,7 @@ import (
 
 type Memory struct{}
 
+// Collect Memory utilization
 func (m Memory) Collect(instanceId string, c CloudWatchService) {
 	memoryMetrics, err := mem.VirtualMemory()
 	if err != nil {
