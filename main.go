@@ -18,7 +18,7 @@ import (
 // GetInstanceID return EC2 instance id
 func GetInstanceID() (string, error) {
 	value := os.Getenv("AWS_INSTANCE_ID")
-	if len(value) == 0 {
+	if len(value) > 0 {
 		return value, nil
 	}
 	client := &http.Client{}
