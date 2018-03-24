@@ -13,7 +13,8 @@ import (
 	"github.com/urfave/cli"
 )
 
-func GetInstanceId() (string, error) {
+// GetInstanceID return EC2 instance id
+func GetInstanceID() (string, error) {
 	value := os.Getenv("AWS_INSTANCE_ID")
 	if len(value) == 0 {
 		return value, nil
@@ -37,8 +38,9 @@ func GetInstanceId() (string, error) {
 	return string(data), nil
 }
 
+// Collect metrics about enabled metric
 func Collect(metrics []Metric, c CloudWatchService) {
-	id, err := GetInstanceId()
+	id, err := GetInstanceID()
 	if err != nil {
 		log.Fatal(err)
 	}

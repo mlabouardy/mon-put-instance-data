@@ -8,10 +8,11 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
+// Memory metric entity
 type Memory struct{}
 
 // Collect Memory utilization
-func (m Memory) Collect(instanceId string, c CloudWatchService) {
+func (m Memory) Collect(instanceID string, c CloudWatchService) {
 	memoryMetrics, err := mem.VirtualMemory()
 	if err != nil {
 		log.Fatal(err)
@@ -21,7 +22,7 @@ func (m Memory) Collect(instanceId string, c CloudWatchService) {
 	dimensions := []cloudwatch.Dimension{
 		cloudwatch.Dimension{
 			Name:  &dimensionKey,
-			Value: &instanceId,
+			Value: &instanceID,
 		},
 	}
 
