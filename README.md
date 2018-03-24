@@ -76,3 +76,7 @@ docker run -d -e AWS_INSTANCE_ID="" -e AWS_ACCESS_KEY_ID="" -e AWS_SECRET_ACCESS
 * Amazon Linux 2
 * Ubuntu 16.04
 * Microsoft Windows Server
+
+## Tutorial
+
+* [Publish Custom Metrics to AWS CloudWatch](http://www.blog.labouardy.com/publish-custom-metrics-aws-cloudwatch/)
