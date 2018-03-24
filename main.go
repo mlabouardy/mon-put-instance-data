@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
-	. "github.com/mlabouardy/cloudwatch/metrics"
-	. "github.com/mlabouardy/cloudwatch/services"
+	"github.com/mlabouardy/cloudwatch/metrics"
+	"github.com/mlabouardy/cloudwatch/services"
 	"github.com/urfave/cli"
 )
 

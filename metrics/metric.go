@@ -2,7 +2,7 @@ package metrics
 
 import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	. "github.com/mlabouardy/cloudwatch/services"
+	"github.com/mlabouardy/cloudwatch/services"
 )
 
 // Metric entity
