@@ -10,8 +10,11 @@ jobs:
           name: Install dependencies
           command: go get -v
       - run: 
+          name: Install required windows dependency
+          command: GOOS=windows go get github.com/StackExchange/wmi
+      - run:
           name: Install gox
-          command: GOOS=windows go get github.com/mitchellh/gox github.com/StackExchange/wmi
+          command: go get github.com/mitchellh/gox 
       - run:
           name: Build CLI
           command: gox -osarch="linux/amd64 windows/amd64"
