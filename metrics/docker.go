@@ -12,6 +12,7 @@ import (
 	"github.com/shirou/gopsutil/docker"
 )
 
+// Docker metric entity
 type Docker struct{}
 
 // On older systems, the control groups might be mounted on /cgroup
@@ -28,7 +29,7 @@ func getCgroupMountPath() (string, error) {
 }
 
 // Collect CPU & Memory usage per Docker Container
-func (d Docker) Collect(instanceId string, c CloudWatchService) {
+func (d Docker) Collect(instanceID string, c CloudWatchService) {
 	containers, err := docker.GetDockerStat()
 	if err != nil {
 		log.Fatal(err)
@@ -44,7 +45,7 @@ func (d Docker) Collect(instanceId string, c CloudWatchService) {
 		dimensionKey1 := "InstanceId"
 		dimensions = append(dimensions, cloudwatch.Dimension{
 			Name:  &dimensionKey1,
-			Value: &instanceId,
+			Value: &instanceID,
 		})
 		dimensionKey2 := "ContainerId"
 		dimensions = append(dimensions, cloudwatch.Dimension{

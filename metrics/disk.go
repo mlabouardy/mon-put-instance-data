@@ -8,10 +8,11 @@ import (
 	"github.com/shirou/gopsutil/disk"
 )
 
+// Disk metric entity
 type Disk struct{}
 
 // Collect Disk used & free space
-func (d Disk) Collect(instanceId string, c CloudWatchService) {
+func (d Disk) Collect(instanceID string, c CloudWatchService) {
 	diskMetrics, err := disk.Usage("/")
 	if err != nil {
 		log.Fatal(err)
@@ -21,7 +22,7 @@ func (d Disk) Collect(instanceId string, c CloudWatchService) {
 	dimensions := []cloudwatch.Dimension{
 		cloudwatch.Dimension{
 			Name:  &dimensionKey,
-			Value: &instanceId,
+			Value: &instanceID,
 		},
 	}
 

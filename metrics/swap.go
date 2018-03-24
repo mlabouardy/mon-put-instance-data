@@ -8,10 +8,11 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
+// Swap metric entity
 type Swap struct{}
 
 // Collect Swap usage
-func (d Swap) Collect(instanceId string, c CloudWatchService) {
+func (d Swap) Collect(instanceID string, c CloudWatchService) {
 	swapMetrics, err := mem.SwapMemory()
 	if err != nil {
 		log.Fatal(err)
@@ -21,7 +22,7 @@ func (d Swap) Collect(instanceId string, c CloudWatchService) {
 	dimensions := []cloudwatch.Dimension{
 		cloudwatch.Dimension{
 			Name:  &dimensionKey,
-			Value: &instanceId,
+			Value: &instanceID,
 		},
 	}
 

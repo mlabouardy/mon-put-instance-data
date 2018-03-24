@@ -8,10 +8,11 @@ import (
 	"github.com/shirou/gopsutil/net"
 )
 
+// Network metric entity
 type Network struct{}
 
 // Collect Network Traffic metrics
-func (n Network) Collect(instanceId string, c CloudWatchService) {
+func (n Network) Collect(instanceID string, c CloudWatchService) {
 	networkMetrics, err := net.IOCounters(false)
 	if err != nil {
 		log.Fatal(err)
@@ -22,7 +23,7 @@ func (n Network) Collect(instanceId string, c CloudWatchService) {
 		dimensionKey1 := "InstanceId"
 		dimensions = append(dimensions, cloudwatch.Dimension{
 			Name:  &dimensionKey1,
-			Value: &instanceId,
+			Value: &instanceID,
 		})
 		dimensionKey2 := "IOCounter"
 		dimensions = append(dimensions, cloudwatch.Dimension{
