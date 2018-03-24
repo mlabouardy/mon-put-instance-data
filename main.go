@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -88,21 +90,27 @@ func main() {
 		},
 	}
 	app.Action = func(c *cli.Context) error {
+		enabledMetrics := make([]string, 0)
 		metrics := make([]Metric, 0)
 		if c.Bool("memory") {
 			metrics = append(metrics, Memory{})
+			enabledMetrics = append(enabledMetrics, "memory")
 		}
 		if c.Bool("swap") {
 			metrics = append(metrics, Swap{})
+			enabledMetrics = append(enabledMetrics, "swap")
 		}
 		if c.Bool("disk") {
 			metrics = append(metrics, Disk{})
+			enabledMetrics = append(enabledMetrics, "disk")
 		}
 		if c.Bool("network") {
 			metrics = append(metrics, Network{})
+			enabledMetrics = append(enabledMetrics, "network")
 		}
 		if c.Bool("docker") {
 			metrics = append(metrics, Docker{})
+			enabledMetrics = append(enabledMetrics, "docker")
 		}
 
 		cfg, err := external.LoadDefaultAWSConfig()
@@ -116,6 +124,9 @@ func main() {
 		}
 
 		interval := c.Int("interval")
+
+		fmt.Printf("Interval: %d minutes - Features enabled: %s\n", interval, strings.Join(enabledMetrics, ", "))
+
 		duration := time.Duration(interval) * time.Minute
 		for _ = range time.Tick(duration) {
 			Collect(metrics, cloudWatch)

@@ -41,6 +41,14 @@ wget https://s3.us-east-1.amazonaws.com/mon-put-instance-data/1.0.0/windows/mon-
 mon-put-instance-data --memory --swap --disk --network --docker --duration 1
 ```
 
+## Docker
+
+Use the official Docker image:
+
+```
+docker run -d -e AWS_INSTANCE_ID="" -e AWS_ACCESS_KEY_ID="" -e AWS_SECRET_ACCESS_KEY="" --name collector mlabouardy/mon-put-instance-data --memory --swap --interval 1
+```
+
 ## Metrics
 
 * Memory
