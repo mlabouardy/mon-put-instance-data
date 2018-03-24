@@ -11,7 +11,7 @@ jobs:
           command: go get -v
       - run: 
           name: Install gox
-          command: go get github.com/mitchellh/gox
+          command: go get github.com/mitchellh/gox github.com/StackExchange/wmi
       - run:
           name: Build CLI
           command: gox -osarch="linux/amd64 windows/amd64"
