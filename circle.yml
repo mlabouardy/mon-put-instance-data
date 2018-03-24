@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build_cli:
+  build:
     docker:
       - image: golang:1.8
     working_directory: /go/src/github.com/mlabouardy/mon-put-instance-data
@@ -34,7 +34,7 @@ jobs:
           name: Upload IAM policy
           command: aws s3 cp policy.json s3://mon-put-instance-data/policy.json --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
     
-  build_docker:
+  deploy:
     docker:
       - image: docker:18.02.0-ce
     steps:
@@ -53,9 +53,9 @@ jobs:
 
 workflows:
   version: 2
-  build_cli_docker:
+  build_deploy:
     jobs:
-      - build_cli
-      - build_docker:
+      - build
+      - deploy:
           requires:
-            - build_cli
+            - build
