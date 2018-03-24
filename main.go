@@ -53,7 +53,7 @@ func Collect(metrics []Metric, c CloudWatchService) {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "CloudWatch"
+	app.Name = "mon-put-instance-data"
 	app.Usage = "Publish Custom Metrics to CloudWatch"
 	app.Version = "1.0.0"
 	app.Author = "Mohamed Labouardy"
