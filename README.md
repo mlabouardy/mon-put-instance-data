@@ -1,3 +1,6 @@
+[![Docker Stars](https://img.shields.io/docker/pulls/mlabouardy/mon-put-instance-data.svg)](https://hub.docker.com/r/mlabouardy/mon-put-instance-data/) 
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![CircleCI](https://circleci.com/gh/mlabouardy/mon-put-instance-data/tree/master.svg?style=svg&circle-token=84815df17fc7fed1212bedec59274ddcd9146d57)](https://circleci.com/gh/mlabouardy/mon-put-instance-data/tree/master) [![Go Report Card](https://goreportcard.com/badge/github.com/mlabouardy/mon-put-instance-data)](https://goreportcard.com/report/github.com/mlabouardy/mon-put-instance-data) [![Docker Stars](https://img.shields.io/github/issues/mlabouardy/mon-put-instance-data.svg)](https://github.com/mlabouardy/mon-put-instance-data/issues)  
+
 ## Download
 
 Below are the available downloads for the latest version of CLI (1.0.0). Please download the proper package for your operating system and architecture.
