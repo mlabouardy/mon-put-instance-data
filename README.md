@@ -35,7 +35,7 @@ wget https://s3.us-east-1.amazonaws.com/mon-put-instance-data/1.0.0/windows/mon-
 * Start metrics collector:
 
 ```
-mon-put-instance-data --memory --swap --disk --docker --duration 1
+mon-put-instance-data --memory --swap --disk --network --docker --duration 1
 ```
 
 ## Metrics
