@@ -34,22 +34,22 @@ jobs:
           name: Upload IAM policy
           command: aws s3 cp policy.json s3://mon-put-instance-data/policy.json --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
     
-    build_docker:
-      docker:
-       - image: docker:18.02.0-ce
-      steps:
-          - checkout
-          - setup_remote_docker
-          - run:
-              name: Build Docker Image
-              command: docker build -t mlabouardy/mon-put-instance-data:latest .
-          - deploy:
-              name: Push to DockerHub
-              command: |
-                docker login -u$DOCKERHUB_LOGIN -p$DOCKERHUB_PASSWORD
-                docker tag mlabouardy/mon-put-instance-data:latest mlabouardy/mon-put-instance-data:${CIRCLE_SHA1}
-                docker push mlabouardy/mon-put-instance-data:latest
-                docker push mlabouardy/mon-put-instance-data:${CIRCLE_SHA1}
+  build_docker:
+    docker:
+      - image: docker:18.02.0-ce
+    steps:
+       - checkout
+       - setup_remote_docker
+       - run:
+           name: Build Docker Image
+           command: docker build -t mlabouardy/mon-put-instance-data:latest .
+       - deploy:
+            name: Push to DockerHub
+            command: |
+              docker login -u$DOCKERHUB_LOGIN -p$DOCKERHUB_PASSWORD
+              docker tag mlabouardy/mon-put-instance-data:latest mlabouardy/mon-put-instance-data:${CIRCLE_SHA1}
+              docker push mlabouardy/mon-put-instance-data:latest
+              docker push mlabouardy/mon-put-instance-data:${CIRCLE_SHA1}
 
 workflows:
   version: 2
