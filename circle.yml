@@ -1,0 +1,57 @@
+version: 2
+jobs:
+  build_cli:
+    docker:
+      - image: golang:1.8
+    working_directory: /go/src/github.com/mlabouardy/mon-put-instance-data
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: go get -v
+      - run: 
+          name: Install gox
+          command: go get github.com/mitchellh/gox
+      - run:
+          name: Build CLI
+          command: gox -osarch="linux/amd64 windows/amd64"
+      - run:
+          name: Install AWS CLI
+          command: |
+            apt-get update
+            apt-get install -y awscli
+            chmod +x mon-put-instance-data_windows_amd64.exe mon-put-instance-data_linux_amd64
+      - run:
+          name: Push linux CLI to S3
+          command: aws s3 cp mon-put-instance-data_linux_amd64 s3://mon-put-instance-data/1.0.0/linux/mon-put-instance-data --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+      - run:
+          name: Push windows CLI to S3
+          command: aws s3 cp mon-put-instance-data_windows_amd64 s3://mon-put-instance-data/1.0.0/windows/mon-put-instance-data --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+      - run:
+          name: Upload IAM policy
+          command: aws s3 cp policy.json s3://mon-put-instance-data/policy.json --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+    
+    build_docker:
+      docker:
+       - image: docker:18.02.0-ce
+      steps:
+          - checkout
+          - setup_remote_docker
+          - run:
+              name: Build Docker Image
+              command: docker build -t mlabouardy/mon-put-instance-data:latest .
+          - deploy:
+              name: Push to DockerHub
+              command: |
+                docker login -u$DOCKERHUB_LOGIN -p$DOCKERHUB_PASSWORD
+                docker tag mlabouardy/mon-put-instance-data:latest mlabouardy/mon-put-instance-data:${CIRCLE_SHA1}
+                docker push mlabouardy/mon-put-instance-data:latest
+                docker push mlabouardy/mon-put-instance-data:${CIRCLE_SHA1}
+
+workflows:
+  version: 2
+  build_cli_docker:
+    - build_cli
+    - build_docker:
+        requires:
+          - build_cli

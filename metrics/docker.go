@@ -1,7 +1,11 @@
 package metrics
 
 import (
+	"errors"
+	"fmt"
 	"log"
+	"os/exec"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	. "github.com/mlabouardy/cloudwatch/services"
@@ -10,38 +14,55 @@ import (
 
 type Docker struct{}
 
+// On older systems, the control groups might be mounted on /cgroup
+func getCgroupMountPath() (string, error) {
+	out, err := exec.Command("grep", "-m1", "cgroup", "/proc/mounts").Output()
+	if err != nil {
+		return "", errors.New("Cannot figure out where control groups are mounted")
+	}
+	res := strings.Fields(string(out))
+	if strings.HasPrefix(res[1], "/cgroup") {
+		return "/cgroup", nil
+	}
+	return "/sys/fs/cgroup", nil
+}
+
+// Collect CPU & Memory usage per Docker Container
 func (d Docker) Collect(instanceId string, c CloudWatchService) {
 	containers, err := docker.GetDockerStat()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	dimensionKey := "InstanceId"
-	dimensions := []cloudwatch.Dimension{
-		cloudwatch.Dimension{
-			Name:  &dimensionKey,
-			Value: &instanceId,
-		},
+	base, err := getCgroupMountPath()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	for _, container := range containers {
-		dimensionKey = "ContainerId"
+		dimensions := make([]cloudwatch.Dimension, 0)
+		dimensionKey1 := "InstanceId"
 		dimensions = append(dimensions, cloudwatch.Dimension{
-			Name:  &dimensionKey,
+			Name:  &dimensionKey1,
+			Value: &instanceId,
+		})
+		dimensionKey2 := "ContainerId"
+		dimensions = append(dimensions, cloudwatch.Dimension{
+			Name:  &dimensionKey2,
 			Value: &container.ContainerID,
 		})
-		dimensionKey = "ContainerName"
+		dimensionKey3 := "ContainerName"
 		dimensions = append(dimensions, cloudwatch.Dimension{
-			Name:  &dimensionKey,
+			Name:  &dimensionKey3,
 			Value: &container.Name,
 		})
-		dimensionKey = "DockerImage"
+		dimensionKey4 := "DockerImage"
 		dimensions = append(dimensions, cloudwatch.Dimension{
-			Name:  &dimensionKey,
+			Name:  &dimensionKey4,
 			Value: &container.Image,
 		})
 
-		containerMemory, err := docker.CgroupMemDocker(container.ContainerID)
+		containerMemory, err := docker.CgroupMem(container.ContainerID, fmt.Sprintf("%s/memory/docker", base))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -49,7 +70,7 @@ func (d Docker) Collect(instanceId string, c CloudWatchService) {
 		containerMemoryData := constructMetricDatum("ContainerMemory", float64(containerMemory.MemUsageInBytes), cloudwatch.StandardUnitBytes, dimensions)
 		c.Publish(containerMemoryData, "CustomMetrics")
 
-		containerCPU, err := docker.CgroupCPUDocker(container.ContainerID)
+		containerCPU, err := docker.CgroupCPU(container.ContainerID, fmt.Sprintf("%s/cpuacct/docker", base))
 		if err != nil {
 			log.Fatal(err)
 		}

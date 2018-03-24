@@ -10,6 +10,7 @@ import (
 
 type Swap struct{}
 
+// Collect Swap usage
 func (d Swap) Collect(instanceId string, c CloudWatchService) {
 	swapMetrics, err := mem.SwapMemory()
 	if err != nil {

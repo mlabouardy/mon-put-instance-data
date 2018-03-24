@@ -10,6 +10,7 @@ import (
 
 type Disk struct{}
 
+// Collect Disk used & free space
 func (d Disk) Collect(instanceId string, c CloudWatchService) {
 	diskMetrics, err := disk.Usage("/")
 	if err != nil {
