@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	. "github.com/mlabouardy/cloudwatch/services"
+	. "github.com/mlabouardy/mon-put-instance-data/services"
 	"github.com/shirou/gopsutil/net"
 )
 
