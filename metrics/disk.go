@@ -12,7 +12,7 @@ import (
 type Disk struct{}
 
 // Collect Disk used & free space
-func (d Disk) Collect(instanceID string, c CloudWatchService) {
+func (d Disk) Collect(instanceID string, c CloudWatchService, namespace string) {
 	diskMetrics, err := disk.Usage("/")
 	if err != nil {
 		log.Fatal(err)
@@ -27,13 +27,13 @@ func (d Disk) Collect(instanceID string, c CloudWatchService) {
 	}
 
 	diskUtilizationData := constructMetricDatum("DiskUtilization", diskMetrics.UsedPercent, cloudwatch.StandardUnitPercent, dimensions)
-	c.Publish(diskUtilizationData, "CustomMetrics")
+	c.Publish(diskUtilizationData, namespace)
 
 	diskUsedData := constructMetricDatum("DiskUsed", float64(diskMetrics.Used), cloudwatch.StandardUnitBytes, dimensions)
-	c.Publish(diskUsedData, "CustomMetrics")
+	c.Publish(diskUsedData, namespace)
 
 	diskFreeData := constructMetricDatum("DiskFree", float64(diskMetrics.Free), cloudwatch.StandardUnitBytes, dimensions)
-	c.Publish(diskFreeData, "CustomMetrics")
+	c.Publish(diskFreeData, namespace)
 
 	log.Printf("Disk - Utilization:%v%% Used:%v Free:%v\n", diskMetrics.UsedPercent, diskMetrics.Used, diskMetrics.Free)
 }

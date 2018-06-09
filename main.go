@@ -41,13 +41,13 @@ func GetInstanceID() (string, error) {
 }
 
 // Collect metrics about enabled metric
-func Collect(metrics []Metric, c CloudWatchService) {
+func Collect(metrics []Metric, c CloudWatchService, namespace string) {
 	id, err := GetInstanceID()
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, metric := range metrics {
-		metric.Collect(id, c)
+		metric.Collect(id, c, namespace)
 	}
 }
 
@@ -87,6 +87,11 @@ func main() {
 			Name:  "interval",
 			Usage: "Time interval",
 			Value: 5,
+		},
+		cli.StringFlag{
+			Name:  "namespace",
+			Usage: "Namespace for the metric data",
+			Value: "CustomMetrics",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
@@ -129,7 +134,7 @@ func main() {
 
 		duration := time.Duration(interval) * time.Minute
 		for _ = range time.Tick(duration) {
-			Collect(metrics, cloudWatch)
+			Collect(metrics, cloudWatch, c.String("namespace"))
 		}
 
 		return nil

@@ -12,7 +12,7 @@ import (
 type Memory struct{}
 
 // Collect Memory utilization
-func (m Memory) Collect(instanceID string, c CloudWatchService) {
+func (m Memory) Collect(instanceID string, c CloudWatchService, namespace string) {
 	memoryMetrics, err := mem.VirtualMemory()
 	if err != nil {
 		log.Fatal(err)
@@ -27,13 +27,13 @@ func (m Memory) Collect(instanceID string, c CloudWatchService) {
 	}
 
 	memoryUtilizationData := constructMetricDatum("MemoryUtilization", memoryMetrics.UsedPercent, cloudwatch.StandardUnitPercent, dimensions)
-	c.Publish(memoryUtilizationData, "CustomMetrics")
+	c.Publish(memoryUtilizationData, namespace)
 
 	memoryUsedData := constructMetricDatum("MemoryUsed", float64(memoryMetrics.Used), cloudwatch.StandardUnitBytes, dimensions)
-	c.Publish(memoryUsedData, "CustomMetrics")
+	c.Publish(memoryUsedData, namespace)
 
 	memoryAvailableData := constructMetricDatum("MemoryAvailable", float64(memoryMetrics.Available), cloudwatch.StandardUnitBytes, dimensions)
-	c.Publish(memoryAvailableData, "CustomMetrics")
+	c.Publish(memoryAvailableData, namespace)
 
 	log.Printf("Memory - Utilization:%v%% Used:%v Available:%v\n", memoryMetrics.UsedPercent, memoryMetrics.Used, memoryMetrics.Available)
 }
