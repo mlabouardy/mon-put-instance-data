@@ -88,6 +88,10 @@ func main() {
 			Usage: "Time interval",
 			Value: 5,
 		},
+		cli.BoolFlag{
+			Name:  "once",
+			Usage: "Run once (i.e. not on an interval)",
+		},
 		cli.StringFlag{
 			Name:  "namespace",
 			Usage: "Namespace for the metric data",
@@ -130,11 +134,21 @@ func main() {
 
 		interval := c.Int("interval")
 
-		fmt.Printf("Interval: %d minutes - Features enabled: %s\n", interval, strings.Join(enabledMetrics, ", "))
+		fmt.Printf("Features enabled: %s\n", strings.Join(enabledMetrics, ", "))
 
-		duration := time.Duration(interval) * time.Minute
-		for _ = range time.Tick(duration) {
+		var collect = func() {
 			Collect(metrics, cloudWatch, c.String("namespace"))
+		}
+
+		if c.Bool("once") {
+			collect()
+		} else {
+			fmt.Printf("Interval: %d minutes\n", interval)
+
+			duration := time.Duration(interval) * time.Minute
+			for range time.Tick(duration) {
+				collect()
+			}
 		}
 
 		return nil
