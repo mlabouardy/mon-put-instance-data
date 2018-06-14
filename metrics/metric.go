@@ -7,7 +7,7 @@ import (
 
 // Metric entity
 type Metric interface {
-	Collect(string, CloudWatchService)
+	Collect(string, CloudWatchService, string)
 }
 
 // constructMetricDatum construct cloudwatch data object

@@ -12,7 +12,7 @@ import (
 type Network struct{}
 
 // Collect Network Traffic metrics
-func (n Network) Collect(instanceID string, c CloudWatchService) {
+func (n Network) Collect(instanceID string, c CloudWatchService, namespace string) {
 	networkMetrics, err := net.IOCounters(false)
 	if err != nil {
 		log.Fatal(err)
@@ -32,19 +32,19 @@ func (n Network) Collect(instanceID string, c CloudWatchService) {
 		})
 
 		bytesInData := constructMetricDatum("BytesIn", float64(iocounter.BytesRecv), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(bytesInData, "CustomMetrics")
+		c.Publish(bytesInData, namespace)
 		bytesOutData := constructMetricDatum("BytesOut", float64(iocounter.BytesSent), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(bytesOutData, "CustomMetrics")
+		c.Publish(bytesOutData, namespace)
 
 		packetsInData := constructMetricDatum("PacketsIn", float64(iocounter.PacketsRecv), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(packetsInData, "CustomMetrics")
+		c.Publish(packetsInData, namespace)
 		packetsOutData := constructMetricDatum("PacketsOut", float64(iocounter.PacketsSent), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(packetsOutData, "CustomMetrics")
+		c.Publish(packetsOutData, namespace)
 
 		errorsInData := constructMetricDatum("ErrorsIn", float64(iocounter.Errin), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(errorsInData, "CustomMetrics")
+		c.Publish(errorsInData, namespace)
 		errorsOutData := constructMetricDatum("ErrorsOut", float64(iocounter.Errout), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(errorsOutData, "CustomMetrics")
+		c.Publish(errorsOutData, namespace)
 
 		log.Printf("Network - %s Bytes In/Out: %v/%v Packets In/Out: %v/%v Errors In/Out: %v/%v\n",
 			iocounter.Name, iocounter.BytesRecv, iocounter.BytesSent, iocounter.Errin,

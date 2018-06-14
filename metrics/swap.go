@@ -12,7 +12,7 @@ import (
 type Swap struct{}
 
 // Collect Swap usage
-func (d Swap) Collect(instanceID string, c CloudWatchService) {
+func (d Swap) Collect(instanceID string, c CloudWatchService, namespace string) {
 	swapMetrics, err := mem.SwapMemory()
 	if err != nil {
 		log.Fatal(err)
@@ -27,13 +27,13 @@ func (d Swap) Collect(instanceID string, c CloudWatchService) {
 	}
 
 	swapUtilizationData := constructMetricDatum("SwapUtilization", swapMetrics.UsedPercent, cloudwatch.StandardUnitPercent, dimensions)
-	c.Publish(swapUtilizationData, "CustomMetrics")
+	c.Publish(swapUtilizationData, namespace)
 
 	swapUsedData := constructMetricDatum("SwapUsed", float64(swapMetrics.Used), cloudwatch.StandardUnitBytes, dimensions)
-	c.Publish(swapUsedData, "CustomMetrics")
+	c.Publish(swapUsedData, namespace)
 
 	swapFreeData := constructMetricDatum("SwapFree", float64(swapMetrics.Free), cloudwatch.StandardUnitBytes, dimensions)
-	c.Publish(swapFreeData, "CustomMetrics")
+	c.Publish(swapFreeData, namespace)
 
 	log.Printf("Swap - Utilization:%v%% Used:%v Free:%v\n", swapMetrics.UsedPercent, swapMetrics.Used, swapMetrics.Free)
 }

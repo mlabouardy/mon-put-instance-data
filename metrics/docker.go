@@ -29,7 +29,7 @@ func getCgroupMountPath() (string, error) {
 }
 
 // Collect CPU & Memory usage per Docker Container
-func (d Docker) Collect(instanceID string, c CloudWatchService) {
+func (d Docker) Collect(instanceID string, c CloudWatchService, namespace string) {
 	containers, err := docker.GetDockerStat()
 	if err != nil {
 		log.Fatal(err)
@@ -69,7 +69,7 @@ func (d Docker) Collect(instanceID string, c CloudWatchService) {
 		}
 
 		containerMemoryData := constructMetricDatum("ContainerMemory", float64(containerMemory.MemUsageInBytes), cloudwatch.StandardUnitBytes, dimensions)
-		c.Publish(containerMemoryData, "CustomMetrics")
+		c.Publish(containerMemoryData, namespace)
 
 		containerCPU, err := docker.CgroupCPU(container.ContainerID, fmt.Sprintf("%s/cpuacct/docker", base))
 		if err != nil {
@@ -77,10 +77,10 @@ func (d Docker) Collect(instanceID string, c CloudWatchService) {
 		}
 
 		containerCPUUserData := constructMetricDatum("ContainerCPUUser", float64(containerCPU.User), cloudwatch.StandardUnitSeconds, dimensions)
-		c.Publish(containerCPUUserData, "CustomMetrics")
+		c.Publish(containerCPUUserData, namespace)
 
 		containerCPUSystemData := constructMetricDatum("ContainerCPUSystem", float64(containerCPU.System), cloudwatch.StandardUnitSeconds, dimensions)
-		c.Publish(containerCPUSystemData, "CustomMetrics")
+		c.Publish(containerCPUSystemData, namespace)
 
 		log.Printf("Docker - Container:%s Memory:%v User:%v System:%v\n", container.Name, containerMemory.MemMaxUsageInBytes, containerCPU.User, containerCPU.System)
 	}
